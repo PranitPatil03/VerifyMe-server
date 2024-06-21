@@ -1,9 +1,10 @@
 import "dotenv/config";
 import cors from "cors";
-import mongoose from "mongoose";
 import express, { Request, Response } from "express";
+import { connectToMongoDB } from "./services/db";
 
 const PORT = 4000 || process.env.PORT;
+connectToMongoDB();
 
 const app = express();
 app.use(express.json());
