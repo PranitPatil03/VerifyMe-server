@@ -11,8 +11,6 @@ export const connectToMongoDB = async () => {
 
     const options = {
       autoIndex: true,
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
     };
 
     const connection = await mongoose.connect(mongoURL, options);

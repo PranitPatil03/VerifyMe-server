@@ -1,0 +1,13 @@
+### Create User
+POST http://localhost:4000/api/auth/signup
+Content-Type: application/json
+
+{
+  "firstName": "asdasda23sd",
+  "lastName": "Doe1sada23sd23",
+  "password": "securasde23password123",
+  "contact": {
+    "type": "email",
+    "value": "4234das32323dasd.doe@example.com"
+  }
+}
