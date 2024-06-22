@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { User } from "../models/User";
 import { UserType } from "../services/types";
 import { formatData } from "../services/formatData";
@@ -44,5 +45,31 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const loginUser = async (req: Request, res: Response) => {
   try {
-  } catch (err) {}
+    const { email, password } = req.body;
+
+    const SECRET_ACCESS_KEY = process.env.SECRET_ACCESS_KEY;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Authentication failed" });
+    }
+
+    if (!SECRET_ACCESS_KEY) {
+      throw new Error("JWT secret key not provided");
+    }
+
+    const accessToken = jwt.sign({ id: user.userId }, SECRET_ACCESS_KEY);
+
+    return res.status(200).json({ User: formatData(user)});
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
 };
+
