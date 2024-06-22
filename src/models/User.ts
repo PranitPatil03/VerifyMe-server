@@ -1,19 +1,6 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import { UserType, UserTypeDatabase } from "../services/types";
 
-const ContactSchema: Schema = new Schema({
-  type: {
-    type: String,
-    enum: ["email", "phone"],
-    required: true,
-  },
-  value: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-});
-
 const UserSchema: Schema<UserTypeDatabase> = new Schema({
   userId: {
     type: String,
@@ -32,13 +19,17 @@ const UserSchema: Schema<UserTypeDatabase> = new Schema({
     type: String,
     required: true,
   },
-  contact: {
-    type: ContactSchema,
+  email: {
+    type: String,
     required: true,
+    unique: true,
+  },
+  phone: {
+    type: String,
   },
 });
 
-export const User: Model<UserType> = mongoose.model<UserType>(
+export const User: Model<UserTypeDatabase> = mongoose.model<UserTypeDatabase>(
   "User",
   UserSchema
 );

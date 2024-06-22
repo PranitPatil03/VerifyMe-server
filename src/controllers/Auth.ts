@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 export const createUser = async (req: Request, res: Response) => {
   const date = new Date();
   try {
-    const { firstName, lastName, password, contact } = req.body;
+    const { firstName, lastName, password, email, phone } = req.body;
 
     bcrypt.hash(password, 10, async (err, hashed_password) => {
       if (err) {
@@ -23,7 +23,8 @@ export const createUser = async (req: Request, res: Response) => {
         firstName,
         lastName,
         password: hashed_password,
-        contact: contact,
+        email,
+        phone,
       };
 
       const newUser = new User(user);

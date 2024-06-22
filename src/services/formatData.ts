@@ -14,6 +14,7 @@ export const formatData = (user: UserType) => {
     accessToken,
     firstName: user.firstName,
     lastName: user.lastName,
-    contact: user.contact,
+    email: user.email,
+    phone: user.phone,
   };
 };
