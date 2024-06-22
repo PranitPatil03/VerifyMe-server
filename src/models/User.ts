@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
-import { UserType, UserTypeDatabase } from "../services/types";
+import { UserTypeDatabase } from "../services/types";
 
 const UserSchema: Schema<UserTypeDatabase> = new Schema({
   userId: {

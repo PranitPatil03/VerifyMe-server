@@ -1,9 +1,16 @@
 
-POST http://localhost:4000/api/auth/login
+# POST http://localhost:4000/api/auth/sendmail
+# Content-Type: application/json
+
+# {
+#   "email":"pranit.work.3112@gmail.com"
+# }
+
+POST http://localhost:4000/api/auth/verifyotp
 Content-Type: application/json
 
 {
-  "email":"pranit123@gmail.com",
-  "password": "Test123*"
+  "email":"pranit.work.3112@gmail.com",
+  "userOtp":"154299"
 }
 

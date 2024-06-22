@@ -1,11 +1,14 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../models/User";
-import { UserType } from "../services/types";
+import { Error, UserType } from "../services/types";
 import { formatData } from "../services/formatData";
 
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
+import { sendOtpByMail } from "../services/mail";
+import { generateOtp } from "../services/otp";
+import { Otp } from "../models/Otp";
 
 export const createUser = async (req: Request, res: Response) => {
   const date = new Date();
@@ -67,9 +70,64 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const accessToken = jwt.sign({ id: user.userId }, SECRET_ACCESS_KEY);
 
-    return res.status(200).json({ User: formatData(user)});
+    return res.status(200).json({ User: formatData(user) });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
 };
 
+export const sendOTP = async (req: Request, res: Response) => {
+  const { email } = req.body;
+
+  try {
+    let otp: string | undefined = await generateOtp();
+
+    if (!otp) {
+      throw new Error("Failed to generate OTP");
+    }
+
+    let updatedOtp = await Otp.findOneAndUpdate(
+      { email },
+      { otp },
+      { new: true, upsert: true }
+    );
+
+    if (!updatedOtp) {
+      updatedOtp = await new Otp({ email, otp }).save();
+    }
+
+    await sendOtpByMail(email, otp);
+
+    console.log("OTP sent successfully to:", email);
+
+    return res.status(200).json({ message: "OTP sent successfully", otp });
+  } catch (error: any) {
+    console.error("Error sending OTP:", error);
+    return res.status(500).json({ error: "Failed to send OTP" });
+  }
+};
+
+export const verifyOTP = async (req: Request, res: Response) => {
+  const { email, userOtp } = req.body;
+
+  try {
+    const otpRecord = await Otp.findOne({ email });
+
+    if (!otpRecord) {
+      return res
+        .status(404)
+        .json({ error: "OTP record not found for the email" });
+    }
+
+    if (otpRecord.otp !== userOtp) {
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    return res.status(200).json({ message: "OTP verified successfully" });
+  } catch (error: any) {
+    console.error("Error verifying OTP:", error);
+    return res
+      .status(500)
+      .json({ error: "Failed to verify OTP, Enter Correct OTP" });
+  }
+};
