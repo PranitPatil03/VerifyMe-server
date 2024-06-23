@@ -66,7 +66,7 @@ export const loginUser = async (req: Request, res: Response) => {
 
     if (!SECRET_ACCESS_KEY) {
       throw new Error("JWT secret key not provided");
-    }
+    }   
 
     const accessToken = jwt.sign({ id: user.userId }, SECRET_ACCESS_KEY);
 
@@ -74,7 +74,7 @@ export const loginUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
-};
+};  
 
 export const sendOTP = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -157,10 +157,10 @@ export const changePassword = async (req: Request, res: Response)  => {
     user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({ message: 'Password updated successfully' });
+    res.status(200).json({ message: 'Password updated successfully' ,status:true});
 
   } catch (error:any) {
     console.error('Error changing password:', error.message);
-    res.status(500).json({ error: 'Server error' });
+    res.status(500).json({ error: 'Server error',status:false });
   }
 };
