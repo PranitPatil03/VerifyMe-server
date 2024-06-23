@@ -109,9 +109,12 @@ export const sendOTP = async (req: Request, res: Response) => {
 
 export const verifyOTP = async (req: Request, res: Response) => {
   const { email, userOtp } = req.body;
-
+  console.log("Line 112",email,userOtp)
+  
   try {
     const otpRecord = await Otp.findOne({ email });
+
+    console.log("Line 116",otpRecord)
 
     if (!otpRecord) {
       return res
@@ -123,11 +126,41 @@ export const verifyOTP = async (req: Request, res: Response) => {
       return res.status(400).json({ error: "Invalid OTP" });
     }
 
-    return res.status(200).json({ message: "OTP verified successfully" });
+    return res.status(200).json({ message: "OTP verified successfully" ,status:true});
   } catch (error: any) {
     console.error("Error verifying OTP:", error);
     return res
       .status(500)
-      .json({ error: "Failed to verify OTP, Enter Correct OTP" });
+      .json({ error: "Failed to verify OTP, Enter Correct OTP",status:false});
+  }
+};
+
+export const changePassword = async (req: Request, res: Response)  => {
+  const { email, current_password, new_password } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(current_password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid current password' });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(new_password, salt);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
+
+  } catch (error:any) {
+    console.error('Error changing password:', error.message);
+    res.status(500).json({ error: 'Server error' });
   }
 };
